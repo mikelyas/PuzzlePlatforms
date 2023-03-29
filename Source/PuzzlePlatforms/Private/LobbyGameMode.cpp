@@ -16,10 +16,11 @@ void ALobbyGameMode::PostLogin(APlayerController* NewPlayer)
 	CurrentPlayers++;
 	if (CurrentPlayers == MaxPlayers)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Starting travel"));
 		UWorld* World = GetWorld();
 		if (!ensure(World != nullptr)) return;
 		bUseSeamlessTravel = true;
-		World->ServerTravel("/Game/Maps/Game?listen");
+		World->ServerTravel("/Game/ThirdPerson/Maps/ThirdPersonMap?listen");
 	}
 }
 
