@@ -9,7 +9,7 @@
 #include "../MenuSystem/MainMenu.h"
 #include "../MenuSystem/MenuWidget.h"
 
-const static FName SESSION_NAME = TEXT("My Session Game");
+const static FName SESSION_NAME = NAME_GameSession;
 const static FName SERVER_NAME_SETTINGS_KEY = TEXT("ServerName");
 
 
@@ -50,7 +50,10 @@ void UPuzzlePlatformGameInstance::Init()
 		UE_LOG(LogTemp, Warning, TEXT("Found no subsystem"));
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("Init"));
+	if (GEngine != nullptr)
+	{
+		GEngine->OnNetworkFailure().AddUObject(this, &UPuzzlePlatformGameInstance::OnNetworkFailure);
+	}
 }
 
 void UPuzzlePlatformGameInstance::LoadMenuWidget()
@@ -102,6 +105,11 @@ void UPuzzlePlatformGameInstance::OnDestroySessionComplete(FName SessionName, bo
 	}
 }
 
+void UPuzzlePlatformGameInstance::OnNetworkFailure(UWorld* World, UNetDriver* NetDriver, ENetworkFailure::Type FailureType, const FString& ErrorString)
+{
+	LoadMenuWidget();
+}
+
 void UPuzzlePlatformGameInstance::CreateSession()
 {
 	if (SessionInterface.IsValid())
@@ -115,7 +123,7 @@ void UPuzzlePlatformGameInstance::CreateSession()
 		{
 			SessionSettings.bIsLANMatch = false;
 		}
-		SessionSettings.NumPublicConnections = 2;
+		SessionSettings.NumPublicConnections = 5;
 		SessionSettings.bShouldAdvertise = true;
 		SessionSettings.bUsesPresence = true;
 		SessionSettings.bUseLobbiesIfAvailable = true;
@@ -221,6 +229,14 @@ void UPuzzlePlatformGameInstance::Join(uint32 Index)
 	if (!ensure(PlayerController != nullptr)) return;
 
 	PlayerController->ClientTravel(ip_addr, ETravelType::TRAVEL_Absolute);*/
+}
+
+void UPuzzlePlatformGameInstance::StartSession()
+{
+	if (SessionInterface.IsValid())
+	{
+		SessionInterface->StartSession(SESSION_NAME);
+	}
 }
 
 void UPuzzlePlatformGameInstance::ReturnToMainMenu()

@@ -23,6 +23,10 @@ public:
 
 private:
 
+	void StartGame();
+
+	FTimerHandle GameStartTimer;
+
 	uint8 CurrentPlayers;
 
 	uint8 MaxPlayers;
